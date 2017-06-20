@@ -35,8 +35,8 @@ public class MainIT {
             inv.post(Entity.entity("xxx", MediaType.TEXT_PLAIN));
         }
     }
-    
-     @Test
+
+    @Test
     public void testAchema() {
         System.out.println("schema");
         try (final Meecrowave meecrowave = new Meecrowave(new Meecrowave.Builder().randomHttpPort()).bake()) {
@@ -47,6 +47,20 @@ public class MainIT {
             inv.post(Entity.entity("xxx", MediaType.TEXT_PLAIN));
             inv.post(Entity.entity("xxx", MediaType.TEXT_PLAIN));
             inv.post(Entity.entity("xxx", MediaType.TEXT_PLAIN));
+        }
+    }
+    
+    @Test
+    public void testCompute() {
+        System.out.println("compute");
+        try (final Meecrowave meecrowave = new Meecrowave(new Meecrowave.Builder().randomHttpPort()).bake()) {
+            String base = String.format("http://%s:%d", meecrowave.getConfiguration().getHost(), meecrowave.getConfiguration().getHttpPort());
+            WebTarget target = ClientBuilder.newBuilder().build().register(LoggingFeature.class).target(base);
+
+            Invocation.Builder inv = target.path("/api/compute").request().accept(MediaType.APPLICATION_JSON_TYPE);
+            inv.post(Entity.entity("xxx", MediaType.TEXT_PLAIN));
+//            inv.post(Entity.entity("xxx", MediaType.TEXT_PLAIN));
+//            inv.post(Entity.entity("xxx", MediaType.TEXT_PLAIN));
         }
     }
 

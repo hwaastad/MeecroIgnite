@@ -6,6 +6,7 @@
 package org.waastad.meecroignite.service;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 import javax.cache.Cache;
@@ -17,7 +18,10 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import lombok.extern.log4j.Log4j2;
+import org.apache.ignite.IgniteCompute;
+import org.apache.ignite.Ignition;
 import org.primefaces.extensions.model.fluidgrid.FluidGridItem;
+import org.waastad.meecroignite.compute.MyCallable;
 import org.waastad.meecroignite.qualifier.IgniteCache;
 
 /**
@@ -58,6 +62,24 @@ public class RestResource {
             schemaCache.put(name, list);
         }
         return Response.ok(schemaCache.get(name)).build();
+    }
+    
+    @POST
+    @Path("/compute")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response postJob(String name) {
+        IgniteCompute compute = Ignition.ignite().compute();
+        List<MyCallable> list = new ArrayList<>();
+        list.add(new MyCallable());
+        list.add(new MyCallable());
+        list.add(new MyCallable());
+        list.add(new MyCallable());
+        list.add(new MyCallable());
+        list.add(new MyCallable());
+        Collection<Integer> res = compute.call(list);
+        int total = res.stream().mapToInt(Integer::intValue).sum();        
+        log.info("Got {} from processing", total);
+        return Response.ok().build();
     }
     
 }

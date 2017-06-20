@@ -15,13 +15,9 @@ import javax.enterprise.event.Observes;
 import javax.enterprise.inject.Produces;
 import javax.enterprise.inject.spi.InjectionPoint;
 import lombok.extern.log4j.Log4j2;
+import org.apache.ignite.IgniteCheckedException;
 import org.apache.ignite.Ignition;
-import org.apache.ignite.binary.BinaryBasicIdMapper;
-import org.apache.ignite.binary.BinaryBasicNameMapper;
-import org.apache.ignite.binary.BinaryReflectiveSerializer;
-import org.apache.ignite.binary.BinaryTypeConfiguration;
 import org.apache.ignite.cache.eviction.lru.LruEvictionPolicy;
-import org.apache.ignite.configuration.BinaryConfiguration;
 import org.apache.ignite.configuration.CacheConfiguration;
 import org.apache.ignite.configuration.IgniteConfiguration;
 import org.apache.ignite.configuration.NearCacheConfiguration;
@@ -41,7 +37,7 @@ public class CacheProducer {
     @IgniteCache
     public Cache<String, Object> getCache(InjectionPoint ip) {
         String cacheName = ip.getAnnotated().getAnnotation(IgniteCache.class).name();
-        log.info("Producing cache {}..., loader: {}", cacheName,Thread.currentThread().getContextClassLoader());
+        log.info("Producing cache {}..., loader: {}", cacheName, Thread.currentThread().getContextClassLoader());
         CacheConfiguration<String, Object> cfg = new CacheConfiguration<>();
         cfg.setName(cacheName);
 
@@ -51,8 +47,8 @@ public class CacheProducer {
         //return Ignition.ignite().getOrCreateNearCache(cacheName, nearCacheConfiguration);
     }
 
-    public void init(@Observes @Initialized(ApplicationScoped.class) Object init) {
-        log.info("Initializing cache.....loader: {}",Thread.currentThread().getContextClassLoader());
+    public void init(@Observes @Initialized(ApplicationScoped.class) Object init) throws IgniteCheckedException {
+        log.info("Initializing cache.....loader: {}", Thread.currentThread().getContextClassLoader());
         Ignition.setClientMode(true);
         IgniteConfiguration ic = new IgniteConfiguration();
         ic.setPeerClassLoadingEnabled(true);
